@@ -55,3 +55,7 @@ Set `DATABASE_URL` to a PostgreSQL/Supabase connection string for persistent pro
 Because the Hub intentionally has no authentication, anyone who can reach the Hub URL can also reach the **Manage Hub** page and change Hub configuration. The linked apps remain responsible for their own authentication/security.
 
 If desired later, the dashboard can remain login-free while protecting only the Manage Hub page with a simple admin PIN.
+
+
+## V4 cleanup
+Removed Safety, Contacts, Documents, Specialty Subs, and Inspections from the hub. Existing database rows for these modules are automatically removed on startup.

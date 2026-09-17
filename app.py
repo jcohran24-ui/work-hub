@@ -27,11 +27,6 @@ DEFAULT_APPS = [
     ("timesheets", "Timesheets", "⏱️", "Employee hours, approvals and weekly reports", os.environ.get("TIMESHEETS_URL", ""), "Enter Hours", "Weekly hours", 20),
     ("manpower", "Manpower", "👷", "Daily subcontractor manpower and manhours", os.environ.get("MANPOWER_URL", ""), "Today's Manpower", "Daily field count", 30),
     ("equipment", "Equipment", "🚜", "Rental equipment, delivery dates and pickup dates", os.environ.get("EQUIPMENT_URL", ""), "Open Equipment", "Equipment onsite", 40),
-    ("specialty", "Specialty Subs", "🔨", "Track specialty subcontractors and site visits", os.environ.get("SPECIALTY_URL", ""), "Open Tracker", "Upcoming visits", 50),
-    ("inspections", "Inspections", "🔍", "Requested dates, inspection type and status", os.environ.get("INSPECTIONS_URL", ""), "Open Inspections", "Open inspections", 60),
-    ("safety", "Safety", "🦺", "Observations, incidents and corrective actions", os.environ.get("SAFETY_URL", ""), "Open Safety", "Safety items", 70),
-    ("contacts", "Contacts", "📇", "Project contacts, inspectors, vendors and subs", os.environ.get("CONTACTS_URL", ""), "Find Contact", "Project directory", 80),
-    ("documents", "Documents", "📁", "Forms, QR sheets and frequently used project files", os.environ.get("DOCUMENTS_URL", ""), "Open Documents", "Shared files", 90),
 ]
 
 DEFAULT_PROJECTS = [
@@ -113,6 +108,14 @@ def init_db():
         for stmt in statements:
             cur.execute(stmt)
         conn.commit()
+
+    # Remove retired hub modules from existing databases as well as fresh installs.
+    retired_slugs = ("specialty", "inspections", "safety", "contacts", "documents")
+    for retired_slug in retired_slugs:
+        row = execute("SELECT id FROM apps WHERE slug=?", (retired_slug,), fetchone=True)
+        if row:
+            execute("DELETE FROM project_apps WHERE app_id=?", (row["id"],), commit=True)
+            execute("DELETE FROM apps WHERE id=?", (row["id"],), commit=True)
 
     # Upgrade a V2 database in place by leaving any old users/min_role columns alone.
     # The no-login version simply does not use them.
