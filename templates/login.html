@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Sign In | Field Operations Hub{% endblock %}
+{% block body %}
+<div class="login-shell">
+  <div class="login-card">
+    <div class="brand-mark">FOH</div>
+    <div class="eyebrow dark-text">FIELD OPERATIONS HUB</div>
+    <h1>Sign in</h1>
+    <p class="muted">One starting point for your field applications.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}
+    {% endwith %}
+    <form method="post" class="stack-form">
+      <label>Username<input name="username" autocomplete="username" required></label>
+      <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+      <button class="primary-btn" type="submit">Sign In</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

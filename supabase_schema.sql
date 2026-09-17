@@ -1,0 +1,38 @@
+-- Optional reference schema for the Field Operations Hub.
+-- The Flask application creates these tables automatically when DATABASE_URL points to Supabase Postgres.
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(80) UNIQUE NOT NULL,
+  display_name VARCHAR(120) NOT NULL,
+  password_hash TEXT NOT NULL,
+  role VARCHAR(30) NOT NULL DEFAULT 'field',
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS projects (
+  id SERIAL PRIMARY KEY,
+  slug VARCHAR(80) UNIQUE NOT NULL,
+  name VARCHAR(180) NOT NULL,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS apps (
+  id SERIAL PRIMARY KEY,
+  slug VARCHAR(80) UNIQUE NOT NULL,
+  name VARCHAR(120) NOT NULL,
+  icon VARCHAR(20) NOT NULL DEFAULT '🔗',
+  description TEXT NOT NULL DEFAULT '',
+  url TEXT NOT NULL DEFAULT '',
+  quick_label VARCHAR(80) NOT NULL DEFAULT 'Open App',
+  metric_label VARCHAR(120) NOT NULL DEFAULT '',
+  min_role VARCHAR(30) NOT NULL DEFAULT 'field',
+  sort_order INTEGER NOT NULL DEFAULT 100,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS project_apps (
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+  enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  PRIMARY KEY(project_id, app_id)
+);

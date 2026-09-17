@@ -1,28 +1,21 @@
 services:
   - type: web
     name: field-operations-hub
-    env: python
+    runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
+    healthCheckPath: /health
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.7
       - key: SECRET_KEY
         generateValue: true
-      - key: SCHEDULE_URL
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
         sync: false
-      - key: TIMESHEETS_URL
-        sync: false
-      - key: MANPOWER_URL
-        sync: false
-      - key: EQUIPMENT_URL
-        sync: false
-      - key: SPECIALTY_URL
-        sync: false
-      - key: INSPECTIONS_URL
-        sync: false
-      - key: SAFETY_URL
-        sync: false
-      - key: CONTACTS_URL
-        sync: false
-      - key: DOCUMENTS_URL
+      - key: ADMIN_DISPLAY_NAME
+        value: Jody
+      - key: DATABASE_URL
         sync: false
