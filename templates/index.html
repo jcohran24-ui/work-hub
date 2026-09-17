@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#111827" />
+  <title>Field Operations Hub</title>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">FIELD OPERATIONS HUB</div>
+      <h1>{{ project.name }}</h1>
+    </div>
+    <form method="post" action="{{ url_for('set_project') }}" class="project-select">
+      <label for="project_id">Project</label>
+      <select id="project_id" name="project_id" onchange="this.form.submit()">
+        {% for p in projects %}
+          <option value="{{ p.id }}" {% if p.id == project.id %}selected{% endif %}>{{ p.name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </header>
+
+  <main>
+    <section class="today-grid">
+      <div class="stat"><span>Workers onsite</span><strong>{{ dashboard.workers }}</strong></div>
+      <div class="stat"><span>Subs reporting</span><strong>{{ dashboard.subcontractors }}</strong></div>
+      <div class="stat"><span>Inspections</span><strong>{{ dashboard.inspections }}</strong></div>
+      <div class="stat"><span>Equipment onsite</span><strong>{{ dashboard.equipment }}</strong></div>
+      <div class="stat alert"><span>Pickup overdue</span><strong>{{ dashboard.pickup_overdue }}</strong></div>
+      <div class="stat alert"><span>Schedule behind</span><strong>{{ dashboard.schedule_behind }}</strong></div>
+      <div class="stat"><span>Specialty subs this week</span><strong>{{ dashboard.specialty_week }}</strong></div>
+    </section>
+
+    <section class="section-head">
+      <div>
+        <h2>Work Apps</h2>
+        <p>Open the tools you use every day from one place.</p>
+      </div>
+      <button class="add-btn" onclick="openQuickActions()">+ Add</button>
+    </section>
+
+    <section class="apps-grid">
+      {% for app in apps %}
+      <article class="app-card">
+        <div class="app-top">
+          <div class="app-icon">{{ app.icon }}</div>
+          <div>
+            <h3>{{ app.name }}</h3>
+            <p>{{ app.description }}</p>
+          </div>
+        </div>
+        <div class="metric">{{ app.metric }}</div>
+        {% if app.url != '#' %}
+          <a class="app-link" href="{{ app.url }}" target="_blank" rel="noopener">{{ app.quick }}</a>
+        {% else %}
+          <button class="app-link disabled" type="button" onclick="showNotConnected('{{ app.name }}')">{{ app.quick }}</button>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </section>
+  </main>
+
+  <div id="quickModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Quick Add</h3>
+        <button onclick="closeQuickActions()">×</button>
+      </div>
+      <div class="quick-grid">
+        {% for action in quick_actions %}
+          <button onclick="quickAction('{{ action }}')">{{ action }}</button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
