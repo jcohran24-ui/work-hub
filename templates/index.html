@@ -14,20 +14,18 @@
       </select>
     </form>
     {% endif %}
-    <div class="user-menu">
-      <span>{{ user.display_name }}</span><small>{{ role_labels[user.role] }}</small>
-      {% if user.role == 'admin' %}<a href="{{ url_for('admin') }}">Admin</a>{% endif %}
-      <form method="post" action="{{ url_for('logout') }}"><button type="submit">Sign out</button></form>
-    </div>
+    <a class="manage-link" href="{{ url_for('admin') }}">⚙ Manage Hub</a>
   </div>
 </header>
 <main>
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}
   {% endwith %}
+
   <section class="dashboard-note">
-    <div><strong>Dashboard integrations are ready to connect.</strong><span>Counts will populate here once each app exposes its data/API.</span></div>
+    <div><strong>No Hub sign-in required.</strong><span>Open the hub and go straight to your work apps. Individual apps can keep their own security.</span></div>
   </section>
+
   <section class="today-grid compact-stats">
     <div class="stat"><span>Workers onsite</span><strong>{{ dashboard.workers }}</strong></div>
     <div class="stat"><span>Subs reporting</span><strong>{{ dashboard.subcontractors }}</strong></div>
@@ -36,7 +34,7 @@
   </section>
 
   <section class="section-head">
-    <div><h2>Work Apps</h2><p>Launch the tools available to your role and selected project.</p></div>
+    <div><h2>Work Apps</h2><p>One place to access your field tools.</p></div>
     <button class="add-btn" onclick="openQuickActions()">+ Quick Action</button>
   </section>
 
@@ -49,14 +47,14 @@
       {% else %}<button class="app-link disabled" type="button" onclick="showNotConnected('{{ app.name|e }}')">{{ app.quick_label }}</button>{% endif %}
     </article>
     {% else %}
-    <div class="empty-state">No apps are currently enabled for this project and role.</div>
+    <div class="empty-state">No apps are currently enabled for this project.</div>
     {% endfor %}
   </section>
 </main>
 <div id="quickModal" class="modal" aria-hidden="true">
   <div class="modal-card">
     <div class="modal-head"><h3>Quick Action</h3><button onclick="closeQuickActions()">×</button></div>
-    <p class="muted">These shortcuts will open directly into app entry screens once each integration URL is configured.</p>
+    <p class="muted">Jump directly to one of your work apps.</p>
     <div class="quick-grid">
       {% for app in apps %}<button onclick="quickLaunch('{{ app.url|e }}','{{ app.name|e }}')">{{ app.icon }} {{ app.name }}</button>{% endfor %}
     </div>

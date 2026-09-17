@@ -1,53 +1,57 @@
-# Field Operations Hub – Version 2
+# Field Operations Hub — No Login Version
 
-A mobile-first central launcher and administration portal for field applications such as Schedule, Timesheets, Manpower, Equipment, Inspections, Safety, Contacts and future tools.
+A mobile-first central dashboard for launching and managing work apps from one place.
 
-## Version 2 includes
-- Hub username/password login
-- Administrator dashboard
-- Add/disable projects
-- Add/edit/disable work apps without changing code
-- User accounts with Field, Superintendent and Administrator roles
-- Minimum-role visibility for each app
+## Important change
+
+**There is no sign-in to the Hub.** Opening the Hub URL goes directly to the dashboard.
+
+Each linked app can still use its own login, PIN, or permissions if that app requires them.
+
+## Included
+
+- Direct-to-dashboard home page
 - Project selector
-- PWA manifest/service worker for Add to Home Screen support
-- PostgreSQL/Supabase support with a local SQLite fallback
+- Work app cards
+- Quick Action launcher
+- Manage Hub page at `/admin`
+- Add/edit/disable projects
+- Add/edit/disable/reorder app links
+- Supabase/PostgreSQL support
+- SQLite fallback
+- PWA manifest/service worker
 - GitHub + Render deployment files
 
-## Important authentication note
-The Hub login controls access to the Hub. It does **not yet** automatically sign the user into each separate existing app. True SSO requires updating those apps to trust the same identity provider. That can be added in a later version.
+## Deploy on Render
 
-## Recommended production setup: Supabase
-1. Create or open a Supabase project.
-2. In Supabase, open **Project Settings → Database** and copy a PostgreSQL connection string suitable for your Render service. Prefer the pooler connection string if direct IPv6 connectivity is unavailable.
-3. In Render, create the service from this repository/Blueprint.
-4. Set `DATABASE_URL` to the Supabase PostgreSQL connection string.
-5. Set `ADMIN_PASSWORD` to a strong initial password.
-6. `SECRET_KEY` is generated automatically by Render from `render.yaml`.
-7. Deploy.
+1. Upload the project files to GitHub.
+2. In Render choose **New → Blueprint**.
+3. Connect the GitHub repository.
+4. Render reads `render.yaml` and deploys the Flask app.
+5. Open the Render URL. The dashboard opens immediately with no Hub login.
 
-The app creates its tables automatically. `supabase_schema.sql` is included as a reference if you prefer to create them manually.
+## App URLs
 
-## First login
-- Username: value of `ADMIN_USERNAME` (default `admin`)
-- Password: value you set for `ADMIN_PASSWORD`
+You can configure initial links with environment variables:
 
-If you do not set `ADMIN_PASSWORD`, the development fallback is `ChangeMe123!`. Do not use that fallback on a public deployment.
+- `SCHEDULE_URL`
+- `TIMESHEETS_URL`
+- `MANPOWER_URL`
+- `EQUIPMENT_URL`
+- `SPECIALTY_URL`
+- `INSPECTIONS_URL`
+- `SAFETY_URL`
+- `CONTACTS_URL`
+- `DOCUMENTS_URL`
 
-## Add your existing apps
-Sign in as Administrator → **Admin** → **Apps**. Paste the Render URLs for Schedule, Timesheets, Manpower, Equipment and your other tools. No code change is required.
+After the database is seeded, use **Manage Hub** on the dashboard to edit links without changing code.
 
-## Run locally
-```bash
-pip install -r requirements.txt
-export ADMIN_PASSWORD='YourStrongPassword'
-python app.py
-```
-Then visit `http://localhost:10000`.
+## Database
 
-## Database behavior
-- If `DATABASE_URL` is present and `psycopg` can connect, the Hub uses PostgreSQL/Supabase.
-- Otherwise it uses SQLite at `/tmp/field_hub.db` for local/testing use. Render's `/tmp` storage is not persistent, so use Supabase for production.
+Set `DATABASE_URL` to a PostgreSQL/Supabase connection string for persistent production data. Without it, the app uses `/tmp/field_hub.db`, which is useful for testing but may reset on Render restarts.
 
-## Next integration phase
-The dashboard currently shows placeholders for live counts. To populate Workers Onsite, Inspections, Equipment Onsite, Schedule Alerts, etc., connect each existing application's API/database to the Hub. This can be done one app at a time without rebuilding the Hub.
+## Security note
+
+Because the Hub intentionally has no authentication, anyone who can reach the Hub URL can also reach the **Manage Hub** page and change Hub configuration. The linked apps remain responsible for their own authentication/security.
+
+If desired later, the dashboard can remain login-free while protecting only the Manage Hub page with a simple admin PIN.

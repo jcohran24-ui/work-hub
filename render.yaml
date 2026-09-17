@@ -11,11 +11,5 @@ services:
         value: 3.13.7
       - key: SECRET_KEY
         generateValue: true
-      - key: ADMIN_USERNAME
-        value: admin
-      - key: ADMIN_PASSWORD
-        sync: false
-      - key: ADMIN_DISPLAY_NAME
-        value: Jody
       - key: DATABASE_URL
         sync: false

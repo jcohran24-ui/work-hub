@@ -1,14 +1,5 @@
--- Optional reference schema for the Field Operations Hub.
--- The Flask application creates these tables automatically when DATABASE_URL points to Supabase Postgres.
-CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
-  username VARCHAR(80) UNIQUE NOT NULL,
-  display_name VARCHAR(120) NOT NULL,
-  password_hash TEXT NOT NULL,
-  role VARCHAR(30) NOT NULL DEFAULT 'field',
-  active BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Optional reference schema for the no-login Field Operations Hub.
+-- The Flask application can create these tables automatically.
 CREATE TABLE IF NOT EXISTS projects (
   id SERIAL PRIMARY KEY,
   slug VARCHAR(80) UNIQUE NOT NULL,
@@ -25,6 +16,7 @@ CREATE TABLE IF NOT EXISTS apps (
   url TEXT NOT NULL DEFAULT '',
   quick_label VARCHAR(80) NOT NULL DEFAULT 'Open App',
   metric_label VARCHAR(120) NOT NULL DEFAULT '',
+  -- Retained for backward compatibility with V2 databases; the no-login Hub ignores it.
   min_role VARCHAR(30) NOT NULL DEFAULT 'field',
   sort_order INTEGER NOT NULL DEFAULT 100,
   active BOOLEAN NOT NULL DEFAULT TRUE,
