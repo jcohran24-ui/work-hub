@@ -23,13 +23,13 @@
 
   <main class="container">
     <section class="summary-card">
-      <div><span class="summary-number" id="photoCount">0</span><span class="summary-label">Photos</span></div>
+      <div><span class="summary-number" id="photoCount">0</span><span class="summary-label">Entries</span></div>
       <div><span class="summary-number" id="areaCount">0</span><span class="summary-label">Areas</span></div>
       <div><span class="summary-number" id="issueCount">0</span><span class="summary-label">Issues</span></div>
     </section>
 
     <section class="actions">
-      <button id="addPhotoBtn" class="primary big">＋ Add Photo</button>
+      <button id="addPhotoBtn" class="primary big">＋ Add Entry</button>
       <button id="generateReportBtn" class="secondary big">Generate PDF</button>
     </section>
 
@@ -41,11 +41,11 @@
 
   <div class="modal" id="entryModal" aria-hidden="true">
     <div class="modal-card">
-      <div class="modal-header"><h2 id="modalTitle">Add Photo</h2><button class="icon-btn dark" id="closeModalBtn">✕</button></div>
+      <div class="modal-header"><h2 id="modalTitle">Add Entry</h2><button class="icon-btn dark" id="closeModalBtn">✕</button></div>
       <form id="entryForm">
         <input type="hidden" id="entryId" />
 
-        <label>Photo</label>
+        <label>Photo <span style="font-weight:400;color:#6b7280">(optional)</span></label>
         <div class="photo-choice-grid">
           <button type="button" id="cameraBtn" class="photo-choice">📷<span>Take Photo</span></button>
           <button type="button" id="galleryBtn" class="photo-choice">🖼️<span>Choose Gallery</span></button>
