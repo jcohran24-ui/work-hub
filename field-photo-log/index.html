@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <title>Field Photo Log</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+</head>
+<body>
+  <header class="app-header">
+    <div><h1>Field Photo Log</h1><p id="todayLabel"></p></div>
+    <button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙️</button>
+  </header>
+  <main class="container">
+    <section class="summary-card">
+      <div><span class="summary-number" id="photoCount">0</span><span class="summary-label">Photos</span></div>
+      <div><span class="summary-number" id="areaCount">0</span><span class="summary-label">Areas</span></div>
+      <div><span class="summary-number" id="issueCount">0</span><span class="summary-label">Issues</span></div>
+    </section>
+    <section class="actions">
+      <button id="addPhotoBtn" class="primary big">＋ Add Photo</button>
+      <button id="generateReportBtn" class="secondary big">Generate PDF</button>
+    </section>
+    <section>
+      <div class="section-heading"><h2>Today</h2><button id="clearTodayBtn" class="text-btn danger">Clear Today</button></div>
+      <div id="entryList" class="entry-list"></div>
+    </section>
+  </main>
+
+  <div class="modal" id="entryModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header"><h2 id="modalTitle">Add Photo</h2><button class="icon-btn" id="closeModalBtn">✕</button></div>
+      <form id="entryForm">
+        <input type="hidden" id="entryId" />
+        <label>Photo</label>
+        <input id="photoInput" type="file" accept="image/*" capture="environment" />
+        <img id="photoPreview" class="photo-preview hidden" alt="Preview" />
+        <label for="area">Area</label>
+        <select id="area" required>
+          <option value="">Select area</option>
+          <option>A1</option><option>A2</option><option>A3</option><option>A4</option><option>A5</option>
+          <option>Pool</option><option>Site</option><option>Roundabout</option><option>Service Drive</option><option>Other</option>
+        </select>
+        <label for="category">Category</label>
+        <select id="category" required>
+          <option>Progress</option><option>Safety</option><option>Quality</option><option>Coordination</option>
+          <option>Inspection</option><option>Delivery</option><option>Delay</option>
+        </select>
+        <label for="subcontractor">Subcontractor / Trade</label>
+        <input id="subcontractor" type="text" placeholder="Example: Precision Concrete" />
+        <div class="label-row"><label for="note">Note</label><button type="button" id="voiceBtn" class="voice-btn">🎙 Speak</button></div>
+        <textarea id="note" rows="5" placeholder="Example: A2 underground plumbing continuing. Remaining work scheduled before slab prep." required></textarea>
+        <div class="form-grid">
+          <div><label for="entryDate">Date</label><input id="entryDate" type="date" required /></div>
+          <div><label for="entryTime">Time</label><input id="entryTime" type="time" required /></div>
+        </div>
+        <label class="checkbox-row"><input type="checkbox" id="isIssue" />Mark as issue / follow-up item</label>
+        <button type="submit" class="primary big full">Save Entry</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="settingsModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header"><h2>Report Settings</h2><button class="icon-btn" id="closeSettingsBtn">✕</button></div>
+      <form id="settingsForm">
+        <label for="projectName">Project Name</label><input id="projectName" type="text" value="OASIS CTCC" />
+        <label for="companyName">Company</label><input id="companyName" type="text" value="New South Construction" />
+        <label for="preparedBy">Prepared By</label><input id="preparedBy" type="text" value="Jody Cohran" />
+        <button type="submit" class="primary big full">Save Settings</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="reportRoot" class="report-root"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
