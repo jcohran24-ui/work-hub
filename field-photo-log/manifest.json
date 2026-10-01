@@ -1,1 +1,18 @@
-{"name":"Field Photo Log","short_name":"Photo Log","start_url":"./","display":"standalone","background_color":"#f3f4f6","theme_color":"#111827","icons":[]}
+{
+  "name": "Field Photo Log",
+  "short_name": "Photo Log",
+  "description": "Jobsite photo and note log for Procore daily report attachments.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
