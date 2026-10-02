@@ -25,8 +25,10 @@ button,a.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor
 .tablewrap{overflow:auto;border:1px solid #283851;border-radius:10px}table{width:100%;border-collapse:collapse;min-width:980px}th,td{padding:10px;border-bottom:1px solid #26364d;text-align:left;font-size:12px;vertical-align:top}th{background:#182338;color:#bfd0e4}
 .company-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.company{background:#182338;border:1px solid #283851;border-radius:10px;padding:12px}.company strong{display:block}.company small{display:block;color:var(--muted);margin-top:4px}
 .section-title{display:flex;justify-content:space-between;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:12px}.section-title h2{font-size:15px;margin:0}.section-title span{font-size:11px;color:var(--muted)}
+.qr-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.qr-box{background:#fff;padding:12px;border-radius:10px;display:inline-block}.qr-copy{max-width:520px}.qr-copy p{color:#c9d5e5;font-size:13px;line-height:1.45}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.company-grid{grid-template-columns:1fr}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -87,6 +89,19 @@ button,a.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor
         </table>
       </div>
     </div>
+
+    <div class="card">
+      <div class="section-title"><h2>Jobsite QR Code</h2><span>Daily manpower check-in</span></div>
+      <div class="qr-row">
+        <div id="qrcode" class="qr-box"></div>
+        <div class="qr-copy">
+          <p>This QR code opens the subcontractor daily manpower form at <strong>ctcc-manpower.onrender.com</strong>. You can print it and post it at the trailer or sign-in area.</p>
+          <div class="actions">
+            <button class="primary" id="downloadQrBtn" type="button">Download QR Code</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </div>
 
@@ -94,6 +109,7 @@ button,a.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor
 const SUPABASE_URL="https://nbigdhcvmhyjdvirfcgn.supabase.co";
 const SUPABASE_KEY="sb_publishable_heHrE7pTbbnQk-klhkvqGg_3otOHPqE";
 const TABLE="ctcc_manpower_entries";
+const APP_URL="https://ctcc-manpower.onrender.com/";
 let token=localStorage.getItem("ctcc_manpower_token")||"";
 let dataRows=[];
 const $=id=>document.getElementById(id);
@@ -148,6 +164,19 @@ $("csvBtn").onclick=()=>{
   const csv=[h.join(","),...dataRows.map(r=>h.map(k=>q(r[k])).join(","))].join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="CTCC_Manpower.csv";a.click();URL.revokeObjectURL(a.href);
 };
+
+new QRCode($("qrcode"),{text:APP_URL,width:220,height:220,colorDark:"#000000",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H});
+$("downloadQrBtn").onclick=()=>{
+  const img=document.querySelector("#qrcode img");
+  const canvas=document.querySelector("#qrcode canvas");
+  const url=img?.src||canvas?.toDataURL("image/png");
+  if(!url)return;
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="CTCC_Manpower_QR_Code.png";
+  a.click();
+};
+
 if(token){showDash();load();}else{showLogin();}
 </script>
 </body>
