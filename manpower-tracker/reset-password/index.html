@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reset Superintendent Password</title>
+<style>
+body{margin:0;background:#030817;color:#fff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:460px;margin:0 auto;padding:28px 16px}.card{background:#121b2d;padding:22px 18px}
+h1{font-size:20px;margin:0 0 8px}.sub{color:#a9bad0;font-size:14px;margin-bottom:18px}
+label{display:block;font-size:12px;font-weight:800;margin:14px 0 6px}
+input{width:100%;height:42px;box-sizing:border-box;border:1px solid #3a4c66;background:#202d41;color:#fff;border-radius:9px;padding:0 11px}
+button,a{display:block;width:100%;box-sizing:border-box;margin-top:14px;padding:12px;border-radius:9px;font-weight:900;text-align:center;text-decoration:none}
+button{border:0;background:#ffbf00;color:#101827;cursor:pointer}a{background:#26344a;color:#fff}
+.msg{margin-top:14px;padding:11px;border-radius:9px;font-size:12px;font-weight:700}.ok{background:#113622;color:#bdf5ce}.err{background:#3a171b;color:#ffd4d7}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+<h1>Reset Superintendent Password</h1>
+<div class="sub">CTCC Oasis Manpower Dashboard</div>
+
+<div id="requestSection">
+<label>Email</label>
+<input id="email" type="email" value="jcohran@newsouthconstruction.com">
+<button id="sendBtn">Send Password Reset Email</button>
+</div>
+
+<div id="updateSection" class="hidden">
+<label>New password</label>
+<input id="newPassword" type="password" minlength="8">
+<button id="updateBtn">Set New Password</button>
+</div>
+
+<div id="msg"></div>
+<a href="/dashboard/">Back to Superintendent Dashboard</a>
+</div></div>
+
+<script>
+const URL="https://nbigdhcvmhyjdvirfcgn.supabase.co";
+const KEY="sb_publishable_heHrE7pTbbnQk-klhkvqGg_3otOHPqE";
+const msg=document.getElementById("msg");
+const params=new URLSearchParams(location.hash.slice(1));
+const accessToken=params.get("access_token");
+if(accessToken){
+  document.getElementById("requestSection").classList.add("hidden");
+  document.getElementById("updateSection").classList.remove("hidden");
+}
+function show(text,type){msg.className="msg "+type;msg.textContent=text;}
+document.getElementById("sendBtn").onclick=async()=>{
+  const email=document.getElementById("email").value.trim();
+  try{
+    const r=await fetch(URL+"/auth/v1/recover?redirect_to="+encodeURIComponent("https://ctcc-manpower.onrender.com/reset-password/"),{
+      method:"POST",headers:{"apikey":KEY,"Content-Type":"application/json"},body:JSON.stringify({email})
+    });
+    if(!r.ok) throw new Error(await r.text());
+    show("Reset email sent. Open the link in your email to choose a new password.","ok");
+  }catch(e){show("Unable to send reset email. "+e.message,"err");}
+};
+document.getElementById("updateBtn").onclick=async()=>{
+  const password=document.getElementById("newPassword").value;
+  if(password.length<8){show("Password must be at least 8 characters.","err");return;}
+  try{
+    const r=await fetch(URL+"/auth/v1/user",{method:"PUT",headers:{"apikey":KEY,"Authorization":"Bearer "+accessToken,"Content-Type":"application/json"},body:JSON.stringify({password})});
+    if(!r.ok) throw new Error(await r.text());
+    show("Password updated successfully. You can now sign in to the dashboard.","ok");
+  }catch(e){show("Unable to update password. "+e.message,"err");}
+};
+</script>
+</body>
+</html>
