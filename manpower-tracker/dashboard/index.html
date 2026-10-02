@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#030817">
+<title>CTCC Manpower Dashboard</title>
+<style>
+:root{--bg:#030817;--panel:#121b2d;--input:#202d41;--border:#3a4c66;--text:#f7f9fc;--muted:#8298b7;--yellow:#ffbf00}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:22px 18px 50px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:11px}
+.icon{width:38px;height:38px;border-radius:12px;background:var(--yellow);display:grid;place-items:center;color:#101827;font-weight:900}
+.eyebrow{color:var(--yellow);font-weight:900;letter-spacing:.16em;font-size:12px}
+h1{font-size:18px;margin:3px 0 0}.card{background:var(--panel);padding:18px;border-radius:8px;margin-bottom:16px}
+label{display:block;font-weight:800;font-size:12px;margin-bottom:6px}
+input{width:100%;height:42px;border:1px solid var(--border);background:var(--input);color:#fff;border-radius:9px;padding:0 11px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+button,a.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor:pointer;text-decoration:none}
+.primary{background:var(--yellow);color:#101827}.secondary{background:#26344a;color:#fff;border:1px solid #435774}.danger{background:#472025;color:#ffd6d6}
+.hidden{display:none!important}.msg{margin-top:12px;padding:10px 12px;border-radius:8px;font-size:12px;font-weight:700}.err{background:#3a171b;color:#ffd4d7;border:1px solid #7d2930}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.kpi{background:#182338;border:1px solid #283851;border-radius:10px;padding:14px}.kpi span{color:var(--muted);font-size:11px;font-weight:700}.kpi b{display:block;font-size:24px;margin-top:3px;color:#fff}
+.tablewrap{overflow:auto;border:1px solid #283851;border-radius:10px}table{width:100%;border-collapse:collapse;min-width:980px}th,td{padding:10px;border-bottom:1px solid #26364d;text-align:left;font-size:12px;vertical-align:top}th{background:#182338;color:#bfd0e4}
+.company-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.company{background:#182338;border:1px solid #283851;border-radius:10px;padding:12px}.company strong{display:block}.company small{display:block;color:var(--muted);margin-top:4px}
+.section-title{display:flex;justify-content:space-between;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:12px}.section-title h2{font-size:15px;margin:0}.section-title span{font-size:11px;color:var(--muted)}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.company-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <div class="icon">⛑</div>
+      <div><div class="eyebrow">CTCC OASIS</div><h1>Superintendent Manpower Dashboard</h1></div>
+    </div>
+    <a class="btn secondary" href="/">Back to Daily Check-In</a>
+  </div>
+
+  <section id="loginCard" class="card">
+    <div class="section-title"><h2>Superintendent Access</h2><span>Authorized account required</span></div>
+    <form id="loginForm">
+      <div class="grid">
+        <div><label>Email</label><input name="email" type="email" required autocomplete="username"></div>
+        <div><label>Password</label><input name="password" type="password" required autocomplete="current-password"></div>
+      </div>
+      <div class="actions"><button class="primary" type="submit">Sign In</button></div>
+      <div id="loginMsg"></div>
+    </form>
+  </section>
+
+  <section id="dashboard" class="hidden">
+    <div class="card">
+      <div class="section-title"><h2>Filters</h2><span>Filter dashboard and CSV export</span></div>
+      <div class="grid">
+        <div><label>Start date</label><input id="startDate" type="date"></div>
+        <div><label>End date</label><input id="endDate" type="date"></div>
+      </div>
+      <div class="actions">
+        <button class="secondary" id="refreshBtn" type="button">Refresh</button>
+        <button class="secondary" id="clearBtn" type="button">Clear Filters</button>
+        <button class="primary" id="csvBtn" type="button">Export CSV</button>
+        <button class="danger" id="logoutBtn" type="button">Sign Out</button>
+      </div>
+      <div id="dashMsg"></div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><span>REPORTS</span><b id="kReports">0</b></div>
+      <div class="kpi"><span>WORKERS REPORTED</span><b id="kWorkers">0</b></div>
+      <div class="kpi"><span>TOTAL MANHOURS</span><b id="kHours">0.0</b></div>
+      <div class="kpi"><span>COMPANIES</span><b id="kCompanies">0</b></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h2>Subcontractor Totals</h2><span>Current filtered range</span></div>
+      <div id="companyTotals" class="company-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h2>Detailed Entries</h2><span id="countLabel">0 reports</span></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Date</th><th>Company</th><th>Foreman</th><th>Crew</th><th>Start</th><th>Finish</th><th>Break</th><th>Manhours</th><th>Work Area</th><th>Work Performed</th><th>Notes</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const SUPABASE_URL="https://nbigdhcvmhyjdvirfcgn.supabase.co";
+const SUPABASE_KEY="sb_publishable_heHrE7pTbbnQk-klhkvqGg_3otOHPqE";
+const TABLE="ctcc_manpower_entries";
+let token=localStorage.getItem("ctcc_manpower_token")||"";
+let dataRows=[];
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+
+function err(el,text){el.innerHTML=text?'<div class="msg err">'+esc(text)+'</div>':'';}
+async function login(email,password){
+  const r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});
+  const d=await r.json(); if(!r.ok) throw new Error(d.error_description||d.msg||"Login failed");
+  token=d.access_token; localStorage.setItem("ctcc_manpower_token",token);
+}
+async function api(path){
+  const r=await fetch(SUPABASE_URL+path,{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+token}});
+  const t=await r.text(); let d; try{d=t?JSON.parse(t):null}catch{d=t}
+  if(!r.ok) throw new Error((d&&d.message)||t||("HTTP "+r.status));
+  return d;
+}
+function showDash(){ $("loginCard").classList.add("hidden"); $("dashboard").classList.remove("hidden"); }
+function showLogin(){ $("dashboard").classList.add("hidden"); $("loginCard").classList.remove("hidden"); }
+
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault(); err($("loginMsg"),"");
+  const f=new FormData(e.target);
+  try{ await login(String(f.get("email")).trim(),String(f.get("password"))); showDash(); await load(); }
+  catch(ex){ err($("loginMsg"),"Sign-in failed: "+ex.message); }
+});
+
+async function load(){
+  err($("dashMsg"),"");
+  let q="/rest/v1/"+TABLE+"?select=*&order=work_date.desc,submitted_at.desc";
+  if($("startDate").value) q+="&work_date=gte."+encodeURIComponent($("startDate").value);
+  if($("endDate").value) q+="&work_date=lte."+encodeURIComponent($("endDate").value);
+  try{ dataRows=await api(q); render(); }
+  catch(ex){ err($("dashMsg"),"Unable to load reports: "+ex.message); if(/jwt|401|token/i.test(ex.message)){token="";localStorage.removeItem("ctcc_manpower_token");showLogin();} }
+}
+function render(){
+  let workers=0,mins=0; const companies=new Map();
+  $("rows").innerHTML=dataRows.map(r=>{
+    workers+=Number(r.crew_count||0); mins+=Number(r.total_man_minutes||0);
+    const c=companies.get(r.company)||{reports:0,workers:0,mins:0}; c.reports++; c.workers+=Number(r.crew_count||0); c.mins+=Number(r.total_man_minutes||0); companies.set(r.company,c);
+    return '<tr><td>'+esc(r.work_date)+'</td><td>'+esc(r.company)+'</td><td>'+esc(r.foreman)+'</td><td>'+esc(r.crew_count)+'</td><td>'+esc(String(r.start_time||"").slice(0,5))+'</td><td>'+esc(String(r.end_time||"").slice(0,5))+'</td><td>'+esc(r.break_minutes)+'</td><td>'+((Number(r.total_man_minutes||0))/60).toFixed(1)+'</td><td>'+esc(r.work_area)+'</td><td>'+esc(r.activity)+'</td><td>'+esc(r.notes)+'</td></tr>';
+  }).join("");
+  $("kReports").textContent=dataRows.length; $("kWorkers").textContent=workers; $("kHours").textContent=(mins/60).toFixed(1); $("kCompanies").textContent=companies.size; $("countLabel").textContent=dataRows.length+" report"+(dataRows.length===1?"":"s");
+  $("companyTotals").innerHTML=[...companies.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([n,v])=>'<div class="company"><strong>'+esc(n)+'</strong><small>'+v.reports+' reports • '+v.workers+' workers</small><small>'+((v.mins)/60).toFixed(1)+' manhours</small></div>').join("")||'<div class="company">No reports in this range.</div>';
+}
+$("refreshBtn").onclick=load;
+$("clearBtn").onclick=()=>{$("startDate").value="";$("endDate").value="";load();};
+$("logoutBtn").onclick=()=>{token="";localStorage.removeItem("ctcc_manpower_token");showLogin();};
+$("csvBtn").onclick=()=>{
+  const h=["work_date","company","foreman","crew_count","start_time","end_time","break_minutes","total_minutes","total_man_minutes","work_area","activity","notes","submitted_at"];
+  const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  const csv=[h.join(","),...dataRows.map(r=>h.map(k=>q(r[k])).join(","))].join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="CTCC_Manpower.csv";a.click();URL.revokeObjectURL(a.href);
+};
+if(token){showDash();load();}else{showLogin();}
+</script>
+</body>
+</html>
