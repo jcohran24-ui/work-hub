@@ -91,6 +91,14 @@
         <label for="projectName">Project Name</label><input id="projectName" type="text" value="OASIS CTCC" />
         <label for="companyName">Company</label><input id="companyName" type="text" value="New South Construction" />
         <label for="preparedBy">Prepared By</label><input id="preparedBy" type="text" value="Jody Cohran" />
+
+        <div class="settings-divider"></div>
+        <h3 class="settings-subhead">Procore Integration</h3>
+        <div id="procoreStatus" class="connection-status">Checking connection…</div>
+        <button type="button" id="connectProcoreBtn" class="procore-btn full">Connect Procore</button>
+        <button type="button" id="disconnectProcoreBtn" class="secondary big full hidden">Disconnect Procore</button>
+        <p id="procoreHelp" class="helper-text">Secure OAuth connection. Your Procore password and Client Secret are never stored in this browser.</p>
+
         <button type="submit" class="primary big full">Save Settings</button>
       </form>
     </div>
