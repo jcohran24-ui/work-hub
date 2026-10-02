@@ -25,6 +25,8 @@ button,a.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor
 .tablewrap{overflow:auto;border:1px solid #283851;border-radius:10px}table{width:100%;border-collapse:collapse;min-width:980px}th,td{padding:10px;border-bottom:1px solid #26364d;text-align:left;font-size:12px;vertical-align:top}th{background:#182338;color:#bfd0e4}
 .company-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.company{background:#182338;border:1px solid #283851;border-radius:10px;padding:12px}.company strong{display:block}.company small{display:block;color:var(--muted);margin-top:4px}
 .section-title{display:flex;justify-content:space-between;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:12px}.section-title h2{font-size:15px;margin:0}.section-title span{font-size:11px;color:var(--muted)}
+.photo-btn{background:#26344a;color:#fff;border:1px solid #435774;border-radius:7px;padding:6px 9px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
+.photo-btn+.photo-btn{margin-left:5px}
 .qr-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.qr-box{background:#fff;padding:12px;border-radius:10px;display:inline-block}.qr-copy{max-width:520px}.qr-copy p{color:#c9d5e5;font-size:13px;line-height:1.45}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.company-grid{grid-template-columns:1fr}}
 </style>
@@ -84,7 +86,7 @@ button,a.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor
       <div class="section-title"><h2>Detailed Entries</h2><span id="countLabel">0 reports</span></div>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>Date</th><th>Company</th><th>Foreman</th><th>Crew</th><th>Start</th><th>Finish</th><th>Break</th><th>Manhours</th><th>Work Area</th><th>Work Performed</th><th>Notes</th></tr></thead>
+          <thead><tr><th>Date</th><th>Company</th><th>Foreman</th><th>Crew</th><th>Start</th><th>Finish</th><th>Break</th><th>Manhours</th><th>Work Area</th><th>Work Performed</th><th>Notes</th><th>Photos</th></tr></thead>
           <tbody id="rows"></tbody>
         </table>
       </div>
@@ -150,11 +152,37 @@ function render(){
   $("rows").innerHTML=dataRows.map(r=>{
     workers+=Number(r.crew_count||0); mins+=Number(r.total_man_minutes||0);
     const c=companies.get(r.company)||{reports:0,workers:0,mins:0}; c.reports++; c.workers+=Number(r.crew_count||0); c.mins+=Number(r.total_man_minutes||0); companies.set(r.company,c);
-    return '<tr><td>'+esc(r.work_date)+'</td><td>'+esc(r.company)+'</td><td>'+esc(r.foreman)+'</td><td>'+esc(r.crew_count)+'</td><td>'+esc(String(r.start_time||"").slice(0,5))+'</td><td>'+esc(String(r.end_time||"").slice(0,5))+'</td><td>'+esc(r.break_minutes)+'</td><td>'+((Number(r.total_man_minutes||0))/60).toFixed(1)+'</td><td>'+esc(r.work_area)+'</td><td>'+esc(r.activity)+'</td><td>'+esc(r.notes)+'</td></tr>';
+    const photos=Array.isArray(r.photo_paths)?r.photo_paths:[];
+    const photoButtons=photos.length ? photos.map((p,i)=>'<button class="photo-btn" type="button" data-photo="'+esc(p)+'">Photo '+(i+1)+'</button>').join('') : '—';
+    return '<tr><td>'+esc(r.work_date)+'</td><td>'+esc(r.company)+'</td><td>'+esc(r.foreman)+'</td><td>'+esc(r.crew_count)+'</td><td>'+esc(String(r.start_time||"").slice(0,5))+'</td><td>'+esc(String(r.end_time||"").slice(0,5))+'</td><td>'+esc(r.break_minutes)+'</td><td>'+((Number(r.total_man_minutes||0))/60).toFixed(1)+'</td><td>'+esc(r.work_area)+'</td><td>'+esc(r.activity)+'</td><td>'+esc(r.notes)+'</td><td>'+photoButtons+'</td></tr>';
   }).join("");
   $("kReports").textContent=dataRows.length; $("kWorkers").textContent=workers; $("kHours").textContent=(mins/60).toFixed(1); $("kCompanies").textContent=companies.size; $("countLabel").textContent=dataRows.length+" report"+(dataRows.length===1?"":"s");
   $("companyTotals").innerHTML=[...companies.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([n,v])=>'<div class="company"><strong>'+esc(n)+'</strong><small>'+v.reports+' reports • '+v.workers+' workers</small><small>'+((v.mins)/60).toFixed(1)+' manhours</small></div>').join("")||'<div class="company">No reports in this range.</div>';
 }
+async function openPhoto(path){
+  const popup=window.open("","_blank");
+  try{
+    if(popup) popup.document.write("<p style='font-family:sans-serif'>Loading photo...</p>");
+    const encoded=path.split("/").map(encodeURIComponent).join("/");
+    const r=await fetch(SUPABASE_URL+"/storage/v1/object/authenticated/ctcc-manpower-photos/"+encoded,{
+      headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+token}
+    });
+    if(!r.ok) throw new Error(await r.text());
+    const blob=await r.blob();
+    const url=URL.createObjectURL(blob);
+    if(popup) popup.location.href=url;
+    else window.location.href=url;
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }catch(ex){
+    if(popup) popup.close();
+    err($("dashMsg"),"Unable to open photo.");
+  }
+}
+$("rows").addEventListener("click",e=>{
+  const btn=e.target.closest("[data-photo]");
+  if(btn) openPhoto(btn.dataset.photo);
+});
+
 $("refreshBtn").onclick=load;
 $("clearBtn").onclick=()=>{$("startDate").value="";$("endDate").value="";load();};
 $("logoutBtn").onclick=()=>{token="";localStorage.removeItem("ctcc_manpower_token");showLogin();};
