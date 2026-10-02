@@ -1,212 +1,284 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#111827" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <title>CTCC Manpower Tracker</title>
-  <style>
-    :root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111827;background:#f3f4f6}
-    *{box-sizing:border-box} body{margin:0;background:#f3f4f6}.wrap{max-width:980px;margin:0 auto;padding:18px}
-    .top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px}
-    h1{font-size:1.55rem;margin:0}.sub{color:#6b7280;font-size:.95rem}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
-    .btn.dark{background:#111827;color:white}.btn.light{background:white;border:1px solid #d1d5db}.btn.green{background:#166534;color:white}
-    .card{background:white;border-radius:16px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,.06);margin-bottom:16px}
-    label{display:block;font-weight:700;margin:10px 0 6px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    input,textarea,select{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;background:white}
-    textarea{min-height:92px;resize:vertical}.wide{grid-column:1/-1}.hidden{display:none!important}
-    .msg{margin-top:12px;padding:10px 12px;border-radius:10px;font-weight:600}.ok{background:#dcfce7;color:#166534}.err{background:#fee2e2;color:#991b1b}
-    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}.stat{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:12px}
-    .stat b{display:block;font-size:1.3rem}.tablewrap{overflow:auto;border:1px solid #e5e7eb;border-radius:12px}
-    table{border-collapse:collapse;width:100%;min-width:860px}th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:.9rem;vertical-align:top}th{background:#f8fafc}
-    .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.filters>div{min-width:170px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-    @media(max-width:700px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.wrap{padding:12px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f2f4f">
+<link rel="manifest" href="manifest.webmanifest">
+<title>CTCC Oasis Manpower Tracker</title>
+<style>
+:root{
+  --navy:#0f2f4f;--navy2:#173f67;--blue:#1d6fb8;--blue2:#eaf4fd;--bg:#eef3f7;
+  --card:#fff;--text:#18324a;--muted:#6d7f8f;--line:#dce5ec;--green:#1f8a57;--red:#b43b3b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+button,input,textarea{font:inherit}
+.appbar{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:18px 18px 16px;box-shadow:0 2px 10px rgba(0,0,0,.16)}
+.appbar-inner{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;border-radius:12px;background:#fff1;display:grid;place-items:center;border:1px solid #ffffff24;font-size:26px}
+.brand h1{margin:0;font-size:1.35rem}.brand small{display:block;color:#d6e7f6;margin-top:3px}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav button{border:1px solid #ffffff28;color:#fff;background:#ffffff10;border-radius:10px;padding:10px 13px;font-weight:700;cursor:pointer}
+.nav button.active,.nav button:hover{background:#fff;color:var(--navy)}
+.wrap{max-width:1100px;margin:0 auto;padding:20px}
+.hero{background:linear-gradient(135deg,#fff,#f8fbfd);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 30px rgba(18,51,78,.08);margin-bottom:16px}
+.hero h2{margin:0 0 5px;font-size:1.55rem}.hero p{margin:0;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 22px rgba(18,51,78,.06);padding:18px;margin-bottom:16px}
+.section-title{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.section-title h3{margin:0;font-size:1.1rem}.section-title span{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.field label{display:block;font-weight:750;margin:0 0 6px;font-size:.92rem}
+.field input,.field textarea{width:100%;border:1px solid #c9d5df;border-radius:10px;padding:11px 12px;background:#fff;color:var(--text);outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1d6fb81b}
+.field textarea{min-height:90px;resize:vertical}
+.wide{grid-column:1/-1}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.btn{border:0;border-radius:10px;padding:11px 15px;font-weight:800;cursor:pointer}
+.btn.primary{background:var(--blue);color:#fff}.btn.primary:hover{background:#185f9c}
+.btn.dark{background:var(--navy);color:#fff}.btn.light{background:#fff;border:1px solid var(--line);color:var(--text)}
+.btn.green{background:var(--green);color:#fff}
+.notice{padding:11px 12px;border-radius:10px;margin-top:12px;font-weight:700}
+.notice.ok{background:#e9f7ef;color:#146b42}.notice.err{background:#fdeeee;color:#962f2f}
+.hidden{display:none!important}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 4px 16px rgba(18,51,78,.05)}
+.kpi span{display:block;color:var(--muted);font-size:.84rem;font-weight:700}.kpi b{display:block;font-size:1.7rem;margin-top:3px;color:var(--navy)}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.filters .field{min-width:170px}
+.company-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.company-card{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfdff}
+.company-card strong{display:block;color:var(--navy)}.company-card small{display:block;color:var(--muted);margin-top:4px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:940px}
+th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;font-size:.88rem;vertical-align:top}
+th{background:#f5f9fc;color:#3c556a;position:sticky;top:0}
+.qrbox{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+#qrcode{background:#fff;border:1px solid var(--line);padding:12px;border-radius:12px}
+.install-note{font-size:.9rem;color:var(--muted);margin-top:8px}
+.mobile-summary{display:none}
+@media(max-width:760px){
+  .wrap{padding:12px}.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.company-grid{grid-template-columns:1fr}
+  .appbar{padding:14px 12px}.brand h1{font-size:1.08rem}.hero h2{font-size:1.28rem}.mobile-summary{display:block}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body>
-<div class="wrap">
-  <div class="top">
-    <div><h1>CTCC Manpower Tracker</h1><div class="sub">Daily subcontractor manpower and manhours</div></div>
-    <div class="tabs">
-      <button class="btn dark" id="showForm">Daily Report</button>
-      <button class="btn light" id="showAdmin">Admin Dashboard</button>
-      <button class="btn light hidden" id="installBtn">Install App</button>
+<header class="appbar">
+  <div class="appbar-inner">
+    <div class="brand">
+      <div class="logo">⛑️</div>
+      <div><h1>CTCC Oasis Manpower Tracker</h1><small>Daily subcontractor manpower reporting</small></div>
+    </div>
+    <div class="nav">
+      <button id="navReport" class="active">Daily Report</button>
+      <button id="navAdmin">Superintendent Dashboard</button>
+      <button id="installBtn" class="hidden">Install App</button>
     </div>
   </div>
+</header>
 
-  <section id="formView" class="card">
-    <h2>Submit Daily Report</h2>
-    <form id="manpowerForm">
-      <div class="grid">
-        <div><label>Company</label><input name="company" required maxlength="120" /></div>
-        <div><label>Foreman</label><input name="foreman" required maxlength="120" /></div>
-        <div><label>Crew Count</label><input name="crew_count" type="number" min="1" max="500" required /></div>
-        <div><label>Work Date</label><input name="work_date" type="date" required /></div>
-        <div><label>Start Time</label><input name="start_time" type="time" required /></div>
-        <div><label>End Time</label><input name="end_time" type="time" required /></div>
-        <div><label>Break Minutes</label><input name="break_minutes" type="number" min="0" max="720" value="0" required /></div>
-        <div><label>Total Manhours</label><input id="calcHours" value="0.00" readonly /></div>
-        <div><label>Work Area</label><input name="work_area" required maxlength="160" /></div>
-        <div><label>Activity / Work Performed</label><input name="activity" required maxlength="300" /></div>
-        <div class="wide"><label>Notes</label><textarea name="notes" maxlength="1000"></textarea></div>
+<main class="wrap">
+  <section id="reportView">
+    <div class="hero">
+      <h2>Daily Manpower Report</h2>
+      <p>Complete one report per company, per day. Manhours are calculated automatically from crew size and time worked.</p>
+    </div>
+    <div class="card">
+      <div class="section-title"><h3>Subcontractor Information</h3><span>Required fields</span></div>
+      <form id="reportForm">
+        <div class="grid">
+          <div class="field"><label>Company</label><input name="company" required maxlength="120" autocomplete="organization"></div>
+          <div class="field"><label>Foreman / Supervisor</label><input name="foreman" required maxlength="120" autocomplete="name"></div>
+          <div class="field"><label>Crew Count</label><input name="crew_count" type="number" min="1" max="500" required></div>
+          <div class="field"><label>Work Date</label><input name="work_date" type="date" required></div>
+          <div class="field"><label>Start Time</label><input name="start_time" type="time" required></div>
+          <div class="field"><label>End Time</label><input name="end_time" type="time" required></div>
+          <div class="field"><label>Break Minutes</label><input name="break_minutes" type="number" min="0" max="720" value="0" required></div>
+          <div class="field"><label>Calculated Manhours</label><input id="calculatedManhours" value="0.00" readonly></div>
+          <div class="field"><label>Work Area</label><input name="work_area" required maxlength="160" placeholder="Example: A1, Adult Pool, Service Drive"></div>
+          <div class="field"><label>Activity / Work Performed</label><input name="activity" required maxlength="300"></div>
+          <div class="field wide"><label>Notes</label><textarea name="notes" maxlength="1000" placeholder="Optional notes, delays, access issues, or coordination items"></textarea></div>
+        </div>
+        <div class="actions">
+          <button class="btn green" type="submit">Submit Daily Report</button>
+          <button class="btn light" type="button" id="clearForm">Clear</button>
+        </div>
+        <div id="reportMsg"></div>
+      </form>
+    </div>
+    <div class="card mobile-summary">
+      <strong>Tip:</strong> Add this page to your phone home screen for quick daily access.
+    </div>
+  </section>
+
+  <section id="loginView" class="hidden">
+    <div class="hero"><h2>Superintendent Dashboard</h2><p>Protected access to manpower reports, totals, exports, and the permanent QR code.</p></div>
+    <div class="card">
+      <div class="section-title"><h3>Admin Sign In</h3><span>Authorized account required</span></div>
+      <form id="loginForm">
+        <div class="grid">
+          <div class="field"><label>Email</label><input name="email" type="email" required autocomplete="username"></div>
+          <div class="field"><label>Password</label><input name="password" type="password" required autocomplete="current-password"></div>
+        </div>
+        <div class="actions"><button class="btn dark" type="submit">Sign In</button></div>
+        <div id="loginMsg"></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="dashboardView" class="hidden">
+    <div class="hero">
+      <div class="section-title"><div><h2 style="margin:0">Superintendent Dashboard</h2><p style="margin-top:5px">Live totals from the existing CTCC manpower database.</p></div><button class="btn light" id="logoutBtn">Sign Out</button></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h3>Report Filters</h3><span>Filter dashboard and exports</span></div>
+      <div class="filters">
+        <div class="field"><label>Start Date</label><input id="startFilter" type="date"></div>
+        <div class="field"><label>End Date</label><input id="endFilter" type="date"></div>
+        <button class="btn dark" id="refreshBtn">Refresh</button>
+        <button class="btn light" id="resetFilterBtn">Reset</button>
       </div>
-      <div class="actions"><button class="btn green" type="submit">Submit Daily Report</button></div>
-      <div id="formMsg"></div>
-    </form>
-  </section>
+    </div>
 
-  <section id="adminLogin" class="card hidden">
-    <h2>Admin Login</h2>
-    <p class="sub">Sign in with the authorized Supabase account to view reports.</p>
-    <form id="loginForm">
-      <div class="grid">
-        <div><label>Email</label><input name="email" type="email" autocomplete="username" required /></div>
-        <div><label>Password</label><input name="password" type="password" autocomplete="current-password" required /></div>
+    <div class="kpis">
+      <div class="kpi"><span>Reports</span><b id="kpiReports">0</b></div>
+      <div class="kpi"><span>Workers Reported</span><b id="kpiWorkers">0</b></div>
+      <div class="kpi"><span>Total Manhours</span><b id="kpiManhours">0.0</b></div>
+      <div class="kpi"><span>Companies</span><b id="kpiCompanies">0</b></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h3>Subcontractor Totals</h3><span>Current filtered date range</span></div>
+      <div id="companyTotals" class="company-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h3>Detailed Entries</h3><span id="detailCount">0 reports</span></div>
+      <div class="actions" style="margin:0 0 12px"><button class="btn primary" id="csvBtn">Export CSV</button></div>
+      <div id="dashboardMsg"></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Date</th><th>Company</th><th>Foreman</th><th>Crew</th><th>Start</th><th>End</th><th>Manhours</th><th>Area</th><th>Activity</th><th>Notes</th></tr></thead>
+          <tbody id="reportRows"></tbody>
+        </table>
       </div>
-      <div class="actions"><button class="btn dark" type="submit">Sign In</button></div>
-      <div id="loginMsg"></div>
-    </form>
-  </section>
+    </div>
 
-  <section id="dashboard" class="card hidden">
-    <div class="top">
-      <div><h2 style="margin:0">Admin Dashboard</h2><div class="sub">Existing and new reports from the same Supabase table</div></div>
-      <button class="btn light" id="logoutBtn">Sign Out</button>
+    <div class="card">
+      <div class="section-title"><h3>Permanent Jobsite QR Code</h3><span>Points to this daily report app</span></div>
+      <div class="qrbox">
+        <div id="qrcode"></div>
+        <div>
+          <p style="margin-top:0">Post this QR code at the trailer or sign-in area so subcontractors can open the manpower report directly.</p>
+          <button class="btn dark" id="downloadQrBtn">Download QR Code</button>
+          <div class="install-note">The QR code points to the permanent Render URL, so future code updates do not require a new QR.</div>
+        </div>
+      </div>
     </div>
-    <div class="filters">
-      <div><label>Start Date</label><input id="startFilter" type="date" /></div>
-      <div><label>End Date</label><input id="endFilter" type="date" /></div>
-      <div class="actions"><button class="btn dark" id="refreshBtn">Refresh</button><button class="btn light" id="csvBtn">Export CSV</button></div>
-    </div>
-    <div class="stats">
-      <div class="stat"><span>Total Reports</span><b id="sReports">0</b></div>
-      <div class="stat"><span>Total Crew Count</span><b id="sCrew">0</b></div>
-      <div class="stat"><span>Total Manhours</span><b id="sHours">0.00</b></div>
-    </div>
-    <div id="dashMsg"></div>
-    <div class="tablewrap"><table>
-      <thead><tr><th>Date</th><th>Company</th><th>Foreman</th><th>Crew</th><th>Hours</th><th>Manhours</th><th>Area</th><th>Activity</th><th>Notes</th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table></div>
   </section>
-</div>
+</main>
 
 <script>
-const SUPABASE_URL = "https://nbigdhcvmhyjdvirfcgn.supabase.co";
-const SUPABASE_KEY = "sb_publishable_heHrE7pTbbnQk-klhkvqGg_3otOHPqE";
-const TABLE = "ctcc_manpower_entries";
-let accessToken = localStorage.getItem("ctcc_manpower_access_token") || "";
-let currentRows = [];
-let deferredPrompt = null;
+const SUPABASE_URL="https://nbigdhcvmhyjdvirfcgn.supabase.co";
+const SUPABASE_KEY="sb_publishable_heHrE7pTbbnQk-klhkvqGg_3otOHPqE";
+const TABLE="ctcc_manpower_entries";
+const APP_URL="https://ctcc-manpower.onrender.com/";
+let token=localStorage.getItem("ctcc_manpower_token")||"";
+let rows=[];
+let deferredPrompt=null;
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+document.querySelector('[name="work_date"]').value=today();
 
-const el = id => document.getElementById(id);
-const today = new Date().toISOString().slice(0,10);
-document.querySelector('[name="work_date"]').value = today;
-
-function msg(node, text, ok=false){node.innerHTML = text ? '<div class="msg '+(ok?'ok':'err')+'">'+text+'</div>' : '';}
-function esc(v){return String(v??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
-
+function notice(el,text,ok=false){el.innerHTML=text?'<div class="notice '+(ok?'ok':'err')+'">'+text+'</div>':'';}
 function calc(){
-  const f = new FormData(el("manpowerForm"));
-  const crew = Number(f.get("crew_count")||0), brk = Number(f.get("break_minutes")||0);
-  const st = String(f.get("start_time")||""), et = String(f.get("end_time")||"");
-  if(!st || !et || !crew){el("calcHours").value="0.00"; return null;}
-  const [sh,sm]=st.split(":").map(Number), [eh,em]=et.split(":").map(Number);
-  let mins=(eh*60+em)-(sh*60+sm)-brk;
-  if(mins<0) mins+=1440;
-  if(mins<0 || mins>1440) return null;
-  el("calcHours").value=((mins*crew)/60).toFixed(2);
-  return {mins, man:mins*crew};
+ const f=new FormData($("reportForm")),crew=Number(f.get("crew_count")||0),brk=Number(f.get("break_minutes")||0);
+ const st=String(f.get("start_time")||""),et=String(f.get("end_time")||"");
+ if(!crew||!st||!et){$("calculatedManhours").value="0.00";return null}
+ const [sh,sm]=st.split(":").map(Number),[eh,em]=et.split(":").map(Number);
+ let mins=(eh*60+em)-(sh*60+sm)-brk;if(mins<0)mins+=1440;
+ if(mins<0||mins>1440)return null;
+ $("calculatedManhours").value=((mins*crew)/60).toFixed(2);return {mins,man:mins*crew};
 }
-["input","change"].forEach(ev=>el("manpowerForm").addEventListener(ev,calc));
+["input","change"].forEach(evt=>$("reportForm").addEventListener(evt,calc));
 
-async function api(path, opts={}){
-  const headers = Object.assign({"apikey":SUPABASE_KEY,"Content-Type":"application/json"}, opts.headers||{});
-  if(opts.auth) headers.Authorization="Bearer "+accessToken;
-  else headers.Authorization="Bearer "+SUPABASE_KEY;
-  const r=await fetch(SUPABASE_URL+path,{...opts,headers});
-  const text=await r.text(); let data=null; try{data=text?JSON.parse(text):null}catch{data=text}
-  if(!r.ok) throw new Error((data&&data.message)||(data&&data.error_description)||text||("HTTP "+r.status));
-  return data;
+async function api(path,{method="GET",body=null,auth=false,headers={}}={}){
+ const h={"apikey":SUPABASE_KEY,"Content-Type":"application/json",...headers};
+ h.Authorization="Bearer "+(auth?token:SUPABASE_KEY);
+ const r=await fetch(SUPABASE_URL+path,{method,headers:h,body});
+ const txt=await r.text();let data=null;try{data=txt?JSON.parse(txt):null}catch{data=txt}
+ if(!r.ok)throw new Error((data&&data.message)||(data&&data.error_description)||txt||("HTTP "+r.status));
+ return data;
 }
 
-el("manpowerForm").addEventListener("submit", async e=>{
-  e.preventDefault(); msg(el("formMsg"),"");
-  const c=calc(); if(!c) return msg(el("formMsg"),"Please check the time and crew information.");
-  const f=new FormData(e.target);
-  const body={
-    company:String(f.get("company")).trim(), foreman:String(f.get("foreman")).trim(),
-    crew_count:Number(f.get("crew_count")), work_date:f.get("work_date"),
-    start_time:f.get("start_time"), end_time:f.get("end_time"),
-    break_minutes:Number(f.get("break_minutes")), total_minutes:c.mins, total_man_minutes:c.man,
-    work_area:String(f.get("work_area")).trim(), activity:String(f.get("activity")).trim(),
-    notes:String(f.get("notes")||"").trim()
-  };
-  try{
-    await api("/rest/v1/"+TABLE,{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify(body)});
-    msg(el("formMsg"),"Daily manpower report submitted successfully.",true);
-    const keepCompany=body.company, keepForeman=body.foreman;
-    e.target.reset(); document.querySelector('[name="work_date"]').value=today;
-    document.querySelector('[name="company"]').value=keepCompany; document.querySelector('[name="foreman"]').value=keepForeman;
-    document.querySelector('[name="break_minutes"]').value=0; calc();
-  }catch(err){msg(el("formMsg"),"Submission failed: "+esc(err.message));}
+$("reportForm").addEventListener("submit",async e=>{
+ e.preventDefault();notice($("reportMsg"),"");
+ const c=calc();if(!c)return notice($("reportMsg"),"Please check crew count, start time, end time, and break minutes.");
+ const f=new FormData(e.target);
+ const payload={company:String(f.get("company")).trim(),foreman:String(f.get("foreman")).trim(),crew_count:Number(f.get("crew_count")),work_date:f.get("work_date"),start_time:f.get("start_time"),end_time:f.get("end_time"),break_minutes:Number(f.get("break_minutes")),total_minutes:c.mins,total_man_minutes:c.man,work_area:String(f.get("work_area")).trim(),activity:String(f.get("activity")).trim(),notes:String(f.get("notes")||"").trim()};
+ try{
+  await api("/rest/v1/"+TABLE,{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify(payload)});
+  notice($("reportMsg"),"Daily manpower report submitted successfully.",true);
+  const company=payload.company,foreman=payload.foreman;e.target.reset();
+  document.querySelector('[name="company"]').value=company;document.querySelector('[name="foreman"]').value=foreman;
+  document.querySelector('[name="work_date"]').value=today();document.querySelector('[name="break_minutes"]').value=0;calc();
+ }catch(err){notice($("reportMsg"),"Submission failed: "+esc(err.message))}
 });
+$("clearForm").onclick=()=>{const f=$("reportForm");f.reset();document.querySelector('[name="work_date"]').value=today();document.querySelector('[name="break_minutes"]').value=0;calc();notice($("reportMsg"),"")};
 
 async function login(email,password){
-  const r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});
-  const data=await r.json(); if(!r.ok) throw new Error(data.error_description||data.msg||"Login failed");
-  accessToken=data.access_token; localStorage.setItem("ctcc_manpower_access_token",accessToken); return data;
+ const r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});
+ const d=await r.json();if(!r.ok)throw new Error(d.error_description||d.msg||"Login failed");
+ token=d.access_token;localStorage.setItem("ctcc_manpower_token",token);
 }
-el("loginForm").addEventListener("submit",async e=>{
-  e.preventDefault(); msg(el("loginMsg"),"");
-  const f=new FormData(e.target);
-  try{await login(String(f.get("email")).trim(),String(f.get("password"))); showDashboard(); await loadRows();}
-  catch(err){msg(el("loginMsg"),"Sign-in failed: "+esc(err.message));}
+$("loginForm").addEventListener("submit",async e=>{
+ e.preventDefault();notice($("loginMsg"),"");const f=new FormData(e.target);
+ try{await login(String(f.get("email")).trim(),String(f.get("password")));showDashboard();await loadRows();}
+ catch(err){notice($("loginMsg"),"Sign-in failed: "+esc(err.message))}
 });
 
 async function loadRows(){
-  msg(el("dashMsg"),"");
-  let q="/rest/v1/"+TABLE+"?select=*&order=work_date.desc,submitted_at.desc";
-  const s=el("startFilter").value,e=el("endFilter").value;
-  if(s) q+="&work_date=gte."+encodeURIComponent(s);
-  if(e) q+="&work_date=lte."+encodeURIComponent(e);
-  try{
-    currentRows=await api(q,{method:"GET",auth:true});
-    renderRows();
-  }catch(err){
-    if(/jwt|token|401/i.test(err.message)){accessToken="";localStorage.removeItem("ctcc_manpower_access_token");showAdminLogin();}
-    msg(el("dashMsg"),"Unable to load reports: "+esc(err.message));
-  }
+ notice($("dashboardMsg"),"");
+ let q="/rest/v1/"+TABLE+"?select=*&order=work_date.desc,submitted_at.desc";
+ const s=$("startFilter").value,e=$("endFilter").value;if(s)q+="&work_date=gte."+encodeURIComponent(s);if(e)q+="&work_date=lte."+encodeURIComponent(e);
+ try{rows=await api(q,{auth:true});renderDashboard();}
+ catch(err){notice($("dashboardMsg"),"Unable to load reports: "+esc(err.message));if(/jwt|token|401/i.test(err.message)){token="";localStorage.removeItem("ctcc_manpower_token");showLogin();}}
 }
-function renderRows(){
-  let crew=0, man=0;
-  el("rows").innerHTML=currentRows.map(r=>{
-    crew+=Number(r.crew_count||0); man+=Number(r.total_man_minutes||0);
-    const hours=(Number(r.total_minutes||0)/60).toFixed(2), manhours=(Number(r.total_man_minutes||0)/60).toFixed(2);
-    return '<tr><td>'+esc(r.work_date)+'</td><td>'+esc(r.company)+'</td><td>'+esc(r.foreman)+'</td><td>'+esc(r.crew_count)+'</td><td>'+hours+'</td><td>'+manhours+'</td><td>'+esc(r.work_area)+'</td><td>'+esc(r.activity)+'</td><td>'+esc(r.notes)+'</td></tr>';
-  }).join("");
-  el("sReports").textContent=currentRows.length; el("sCrew").textContent=crew; el("sHours").textContent=(man/60).toFixed(2);
+function renderDashboard(){
+ const companies=new Map();let workers=0,manMins=0;
+ $("reportRows").innerHTML=rows.map(r=>{
+  workers+=Number(r.crew_count||0);manMins+=Number(r.total_man_minutes||0);
+  const c=companies.get(r.company)||{reports:0,workers:0,man:0};c.reports++;c.workers+=Number(r.crew_count||0);c.man+=Number(r.total_man_minutes||0);companies.set(r.company,c);
+  return '<tr><td>'+esc(r.work_date)+'</td><td><strong>'+esc(r.company)+'</strong></td><td>'+esc(r.foreman)+'</td><td>'+esc(r.crew_count)+'</td><td>'+esc(String(r.start_time||"").slice(0,5))+'</td><td>'+esc(String(r.end_time||"").slice(0,5))+'</td><td>'+((Number(r.total_man_minutes||0))/60).toFixed(2)+'</td><td>'+esc(r.work_area)+'</td><td>'+esc(r.activity)+'</td><td>'+esc(r.notes)+'</td></tr>';
+ }).join("");
+ $("kpiReports").textContent=rows.length;$("kpiWorkers").textContent=workers;$("kpiManhours").textContent=(manMins/60).toFixed(1);$("kpiCompanies").textContent=companies.size;$("detailCount").textContent=rows.length+" report"+(rows.length===1?"":"s");
+ $("companyTotals").innerHTML=[...companies.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([name,v])=>'<div class="company-card"><strong>'+esc(name)+'</strong><small>'+v.reports+' report'+(v.reports===1?'':'s')+' • '+v.workers+' workers reported</small><small>'+((v.man)/60).toFixed(1)+' total manhours</small></div>').join("")||'<div class="company-card">No reports in this date range.</div>';
 }
-function showForm(){el("formView").classList.remove("hidden");el("adminLogin").classList.add("hidden");el("dashboard").classList.add("hidden");}
-function showAdminLogin(){el("formView").classList.add("hidden");el("dashboard").classList.add("hidden");el("adminLogin").classList.remove("hidden");}
-function showDashboard(){el("formView").classList.add("hidden");el("adminLogin").classList.add("hidden");el("dashboard").classList.remove("hidden");}
-
-el("showForm").onclick=showForm;
-el("showAdmin").onclick=async()=>{if(accessToken){showDashboard();await loadRows();}else showAdminLogin();};
-el("refreshBtn").onclick=loadRows;
-el("logoutBtn").onclick=()=>{accessToken="";localStorage.removeItem("ctcc_manpower_access_token");showAdminLogin();};
-el("csvBtn").onclick=()=>{
-  const headers=["work_date","company","foreman","crew_count","start_time","end_time","break_minutes","total_minutes","total_man_minutes","work_area","activity","notes","submitted_at"];
-  const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-  const csv=[headers.join(","),...currentRows.map(r=>headers.map(h=>q(r[h])).join(","))].join("\n");
-  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="ctcc_manpower_"+today+".csv";a.click();URL.revokeObjectURL(a.href);
+function showReport(){$("reportView").classList.remove("hidden");$("loginView").classList.add("hidden");$("dashboardView").classList.add("hidden");$("navReport").classList.add("active");$("navAdmin").classList.remove("active")}
+function showLogin(){$("reportView").classList.add("hidden");$("dashboardView").classList.add("hidden");$("loginView").classList.remove("hidden");$("navReport").classList.remove("active");$("navAdmin").classList.add("active")}
+function showDashboard(){$("reportView").classList.add("hidden");$("loginView").classList.add("hidden");$("dashboardView").classList.remove("hidden");$("navReport").classList.remove("active");$("navAdmin").classList.add("active")}
+$("navReport").onclick=showReport;
+$("navAdmin").onclick=async()=>{if(token){showDashboard();await loadRows()}else showLogin()};
+$("logoutBtn").onclick=()=>{token="";localStorage.removeItem("ctcc_manpower_token");showLogin()};
+$("refreshBtn").onclick=loadRows;
+$("resetFilterBtn").onclick=()=>{$("startFilter").value="";$("endFilter").value="";loadRows()};
+$("csvBtn").onclick=()=>{
+ const headers=["work_date","company","foreman","crew_count","start_time","end_time","break_minutes","total_minutes","total_man_minutes","work_area","activity","notes","submitted_at"],q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+ const csv=[headers.join(","),...rows.map(r=>headers.map(h=>q(r[h])).join(","))].join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="CTCC_Manpower_"+today()+".csv";a.click();URL.revokeObjectURL(a.href);
 };
 
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;el("installBtn").classList.remove("hidden");});
-el("installBtn").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;el("installBtn").classList.add("hidden");}};
-if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+const qr=new QRCode(document.getElementById("qrcode"),{text:APP_URL,width:180,height:180,colorDark:"#0f2f4f",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.H});
+$("downloadQrBtn").onclick=()=>{const img=document.querySelector("#qrcode img"),canvas=document.querySelector("#qrcode canvas");const url=img?.src||canvas?.toDataURL("image/png");if(!url)return;const a=document.createElement("a");a.href=url;a.download="CTCC_Manpower_QR.png";a.click()};
+
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").classList.remove("hidden")});
+$("installBtn").onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").classList.add("hidden")};
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
 </html>
