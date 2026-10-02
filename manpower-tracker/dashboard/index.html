@@ -15,11 +15,11 @@
 .eyebrow{color:var(--yellow);font-weight:900;letter-spacing:.16em;font-size:12px}
 h1{font-size:18px;margin:3px 0 0}.card{background:var(--panel);padding:18px;border-radius:8px;margin-bottom:16px}
 label{display:block;font-weight:800;font-size:12px;margin-bottom:6px}
-input{width:100%;height:42px;border:1px solid var(--border);background:var(--input);color:#fff;border-radius:9px;padding:0 11px}
+input,select{width:100%;height:42px;border:1px solid var(--border);background:var(--input);color:#fff;border-radius:9px;padding:0 11px}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 button,a.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor:pointer;text-decoration:none}
-.primary{background:var(--yellow);color:#101827}.secondary{background:#26344a;color:#fff;border:1px solid #435774}.danger{background:#472025;color:#ffd6d6}
+.primary{background:var(--yellow);color:#101827}.secondary{background:#26344a;color:#fff;border:1px solid #435774}.danger{background:#472025;color:#ffd6d6}.delete-entry{background:#5b2027;color:#ffd9dc;border:1px solid #8d343d;border-radius:7px;padding:6px 9px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
 .hidden{display:none!important}.msg{margin-top:12px;padding:10px 12px;border-radius:8px;font-size:12px;font-weight:700}.err{background:#3a171b;color:#ffd4d7;border:1px solid #7d2930}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.kpi{background:#182338;border:1px solid #283851;border-radius:10px;padding:14px}.kpi span{color:var(--muted);font-size:11px;font-weight:700}.kpi b{display:block;font-size:24px;margin-top:3px;color:#fff}
 .tablewrap{overflow:auto;border:1px solid #283851;border-radius:10px}table{width:100%;border-collapse:collapse;min-width:980px}th,td{padding:10px;border-bottom:1px solid #26364d;text-align:left;font-size:12px;vertical-align:top}th{background:#182338;color:#bfd0e4}
@@ -60,6 +60,7 @@ button,a.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor
       <div class="grid">
         <div><label>Start date</label><input id="startDate" type="date"></div>
         <div><label>End date</label><input id="endDate" type="date"></div>
+        <div><label>Subcontractor</label><select id="subFilter"><option value="">All subcontractors</option></select></div>
       </div>
       <div class="actions">
         <button class="secondary" id="refreshBtn" type="button">Refresh</button>
@@ -86,7 +87,7 @@ button,a.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor
       <div class="section-title"><h2>Detailed Entries</h2><span id="countLabel">0 reports</span></div>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>Date</th><th>Company</th><th>Foreman</th><th>Crew</th><th>Start</th><th>Finish</th><th>Break</th><th>Manhours</th><th>Work Area</th><th>Work Performed</th><th>Notes</th><th>Photos</th></tr></thead>
+          <thead><tr><th>Date</th><th>Company</th><th>Foreman</th><th>Crew</th><th>Start</th><th>Finish</th><th>Break</th><th>Manhours</th><th>Work Area</th><th>Work Performed</th><th>Notes</th><th>Photos</th><th>Action</th></tr></thead>
           <tbody id="rows"></tbody>
         </table>
       </div>
@@ -144,19 +145,30 @@ async function load(){
   let q="/rest/v1/"+TABLE+"?select=*&order=work_date.desc,submitted_at.desc";
   if($("startDate").value) q+="&work_date=gte."+encodeURIComponent($("startDate").value);
   if($("endDate").value) q+="&work_date=lte."+encodeURIComponent($("endDate").value);
-  try{ dataRows=await api(q); render(); }
+  try{ dataRows=await api(q); populateSubFilter(); render(); }
   catch(ex){ err($("dashMsg"),"Unable to load reports: "+ex.message); if(/jwt|401|token/i.test(ex.message)){token="";localStorage.removeItem("ctcc_manpower_token");showLogin();} }
 }
+function filteredRows(){
+  const selected=$("subFilter").value;
+  return selected ? dataRows.filter(r=>r.company===selected) : dataRows;
+}
+function populateSubFilter(){
+  const current=$("subFilter").value;
+  const names=[...new Set(dataRows.map(r=>r.company).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  $("subFilter").innerHTML='<option value="">All subcontractors</option>'+names.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join("");
+  if(names.includes(current)) $("subFilter").value=current;
+}
 function render(){
+  const visibleRows=filteredRows();
   let workers=0,mins=0; const companies=new Map();
-  $("rows").innerHTML=dataRows.map(r=>{
+  $("rows").innerHTML=visibleRows.map(r=>{
     workers+=Number(r.crew_count||0); mins+=Number(r.total_man_minutes||0);
     const c=companies.get(r.company)||{reports:0,workers:0,mins:0}; c.reports++; c.workers+=Number(r.crew_count||0); c.mins+=Number(r.total_man_minutes||0); companies.set(r.company,c);
     const photos=Array.isArray(r.photo_paths)?r.photo_paths:[];
     const photoButtons=photos.length ? photos.map((p,i)=>'<button class="photo-btn" type="button" data-photo="'+esc(p)+'">Photo '+(i+1)+'</button>').join('') : '—';
-    return '<tr><td>'+esc(r.work_date)+'</td><td>'+esc(r.company)+'</td><td>'+esc(r.foreman)+'</td><td>'+esc(r.crew_count)+'</td><td>'+esc(String(r.start_time||"").slice(0,5))+'</td><td>'+esc(String(r.end_time||"").slice(0,5))+'</td><td>'+esc(r.break_minutes)+'</td><td>'+((Number(r.total_man_minutes||0))/60).toFixed(1)+'</td><td>'+esc(r.work_area)+'</td><td>'+esc(r.activity)+'</td><td>'+esc(r.notes)+'</td><td>'+photoButtons+'</td></tr>';
+    return '<tr><td>'+esc(r.work_date)+'</td><td>'+esc(r.company)+'</td><td>'+esc(r.foreman)+'</td><td>'+esc(r.crew_count)+'</td><td>'+esc(String(r.start_time||"").slice(0,5))+'</td><td>'+esc(String(r.end_time||"").slice(0,5))+'</td><td>'+esc(r.break_minutes)+'</td><td>'+((Number(r.total_man_minutes||0))/60).toFixed(1)+'</td><td>'+esc(r.work_area)+'</td><td>'+esc(r.activity)+'</td><td>'+esc(r.notes)+'</td><td>'+photoButtons+'</td><td><button class="delete-entry" type="button" data-delete-id="'+esc(r.id)+'">Delete</button></td></tr>';
   }).join("");
-  $("kReports").textContent=dataRows.length; $("kWorkers").textContent=workers; $("kHours").textContent=(mins/60).toFixed(1); $("kCompanies").textContent=companies.size; $("countLabel").textContent=dataRows.length+" report"+(dataRows.length===1?"":"s");
+  $("kReports").textContent=visibleRows.length; $("kWorkers").textContent=workers; $("kHours").textContent=(mins/60).toFixed(1); $("kCompanies").textContent=companies.size; $("countLabel").textContent=visibleRows.length+" report"+(visibleRows.length===1?"":"s");
   $("companyTotals").innerHTML=[...companies.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([n,v])=>'<div class="company"><strong>'+esc(n)+'</strong><small>'+v.reports+' reports • '+v.workers+' workers</small><small>'+((v.mins)/60).toFixed(1)+' manhours</small></div>').join("")||'<div class="company">No reports in this range.</div>';
 }
 async function openPhoto(path){
@@ -178,18 +190,51 @@ async function openPhoto(path){
     err($("dashMsg"),"Unable to open photo.");
   }
 }
+async function deletePhoto(path){
+  const encoded=path.split("/").map(encodeURIComponent).join("/");
+  const r=await fetch(SUPABASE_URL+"/storage/v1/object/ctcc-manpower-photos/"+encoded,{
+    method:"DELETE",
+    headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+token}
+  });
+  if(!r.ok && r.status!==404) throw new Error(await r.text());
+}
+async function deleteEntry(id){
+  const row=dataRows.find(r=>String(r.id)===String(id));
+  if(!row)return;
+  const ok=confirm("Delete this manpower entry for "+row.company+" on "+row.work_date+"? This cannot be undone.");
+  if(!ok)return;
+  try{
+    const r=await fetch(SUPABASE_URL+"/rest/v1/"+TABLE+"?id=eq."+encodeURIComponent(id),{
+      method:"DELETE",
+      headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+token,Prefer:"return=minimal"}
+    });
+    if(!r.ok) throw new Error(await r.text());
+    const photos=Array.isArray(row.photo_paths)?row.photo_paths:[];
+    for(const path of photos){
+      try{await deletePhoto(path);}catch{}
+    }
+    dataRows=dataRows.filter(r=>String(r.id)!==String(id));
+    populateSubFilter();
+    render();
+  }catch(ex){
+    err($("dashMsg"),"Unable to delete entry.");
+  }
+}
 $("rows").addEventListener("click",e=>{
-  const btn=e.target.closest("[data-photo]");
-  if(btn) openPhoto(btn.dataset.photo);
+  const photoBtn=e.target.closest("[data-photo]");
+  if(photoBtn){openPhoto(photoBtn.dataset.photo);return;}
+  const deleteBtn=e.target.closest("[data-delete-id]");
+  if(deleteBtn) deleteEntry(deleteBtn.dataset.deleteId);
 });
 
 $("refreshBtn").onclick=load;
-$("clearBtn").onclick=()=>{$("startDate").value="";$("endDate").value="";load();};
+$("subFilter").onchange=render;
+$("clearBtn").onclick=()=>{$("startDate").value="";$("endDate").value="";$("subFilter").value="";load();};
 $("logoutBtn").onclick=()=>{token="";localStorage.removeItem("ctcc_manpower_token");showLogin();};
 $("csvBtn").onclick=()=>{
   const h=["work_date","company","foreman","crew_count","start_time","end_time","break_minutes","total_minutes","total_man_minutes","work_area","activity","notes","submitted_at"];
   const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-  const csv=[h.join(","),...dataRows.map(r=>h.map(k=>q(r[k])).join(","))].join("\n");
+  const csv=[h.join(","),...filteredRows().map(r=>h.map(k=>q(r[k])).join(","))].join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="CTCC_Manpower.csv";a.click();URL.revokeObjectURL(a.href);
 };
 
