@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#030817">
+<title>CTCC Superintendent Setup</title>
+<style>
+:root{--bg:#030817;--panel:#121b2d;--input:#202d41;--border:#3a4c66;--text:#f7f9fc;--muted:#8298b7;--yellow:#ffbf00}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:500px;margin:0 auto;padding:28px 16px 50px}
+.brand{display:flex;align-items:center;gap:11px;margin-bottom:18px}
+.icon{width:38px;height:38px;border-radius:12px;background:var(--yellow);display:grid;place-items:center;color:#101827;font-weight:900}
+.eyebrow{color:var(--yellow);font-weight:900;letter-spacing:.16em;font-size:12px}
+h1{font-size:18px;margin:3px 0 0}
+.card{background:var(--panel);padding:22px 18px;border-radius:8px}
+p{color:#e8eef7;line-height:1.5;font-size:14px}
+label{display:block;font-weight:800;font-size:12px;margin:14px 0 6px}
+input{width:100%;height:42px;border:1px solid var(--border);background:var(--input);color:#fff;border-radius:9px;padding:0 11px;font:inherit}
+input:focus{outline:none;border-color:var(--yellow);box-shadow:0 0 0 3px rgba(255,191,0,.12)}
+button,a{display:block;width:100%;border-radius:9px;padding:12px 14px;font-weight:900;text-align:center;text-decoration:none;margin-top:14px}
+button{border:0;background:var(--yellow);color:#101827;cursor:pointer}
+a{background:#26344a;color:#fff;border:1px solid #435774}
+.msg{margin-top:14px;padding:11px 12px;border-radius:9px;font-size:12px;font-weight:700}
+.ok{background:#113622;color:#bdf5ce;border:1px solid #22623b}
+.err{background:#3a171b;color:#ffd4d7;border:1px solid #7d2930}
+.note{font-size:12px;color:var(--muted);margin-top:12px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="brand">
+    <div class="icon">⛑</div>
+    <div><div class="eyebrow">CTCC OASIS</div><h1>Superintendent Account Setup</h1></div>
+  </div>
+
+  <section class="card">
+    <p>Create the Superintendent login for the manpower dashboard.</p>
+
+    <form id="setupForm">
+      <label>Name</label>
+      <input name="full_name" value="Jody Cohran" autocomplete="name" required>
+
+      <label>Email</label>
+      <input name="email" type="email" value="jcohran@newsouthconstruction.com" autocomplete="username" required>
+
+      <label>Password</label>
+      <input name="password" type="password" autocomplete="new-password" required minlength="8">
+
+      <button type="submit">Create Superintendent Account</button>
+      <div id="msg"></div>
+    </form>
+
+    <div class="note">Your password is sent directly to Supabase Auth and is not stored in the website code.</div>
+    <a href="/dashboard/">Go to Superintendent Dashboard</a>
+  </section>
+</main>
+
+<script>
+const SUPABASE_URL="https://nbigdhcvmhyjdvirfcgn.supabase.co";
+const SUPABASE_KEY="sb_publishable_heHrE7pTbbnQk-klhkvqGg_3otOHPqE";
+const form=document.getElementById("setupForm");
+const msg=document.getElementById("msg");
+
+function show(text,type){msg.className="msg "+type;msg.textContent=text;}
+
+form.addEventListener("submit",async e=>{
+  e.preventDefault();
+  msg.className="";msg.textContent="";
+  const fd=new FormData(form);
+  const email=String(fd.get("email")).trim();
+  const password=String(fd.get("password"));
+  const full_name=String(fd.get("full_name")).trim();
+
+  try{
+    const r=await fetch(SUPABASE_URL+"/auth/v1/signup",{
+      method:"POST",
+      headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},
+      body:JSON.stringify({
+        email,
+        password,
+        data:{full_name}
+      })
+    });
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.msg||data.message||data.error_description||"Unable to create account");
+
+    if(data.access_token){
+      localStorage.setItem("ctcc_manpower_token",data.access_token);
+      show("Account created. You can open the Superintendent Dashboard now.","ok");
+    }else{
+      show("Account created. Check your New South email for a confirmation message, then sign in to the Superintendent Dashboard.","ok");
+    }
+    form.elements.password.value="";
+  }catch(err){
+    show(err.message||"Unable to create account.","err");
+  }
+});
+</script>
+</body>
+</html>
