@@ -1,12 +1,11 @@
 # Idea Trellis: approved affiliate links
-As of 2026-10-10, no verified personal affiliate tracking URLs are available or configured. Website links go directly to software companies but cannot credit commissions yet.
+As of 2026-10-10, the site has the user-provided systeme.io tracking link configured. Public redirect successfully tested and led to systeme.io with sa and sc tracking parameters. Commission attribution has NOT been proven by a referral purchase. Shopify and Kit links remain unconfigured.
 
 ## systeme.io
-1. Register or sign in at https://systeme.io/affiliate-program
-2. Open https://systeme.io/dashboard/affiliate-dashboard
-3. Copy your own affiliate ID.
-4. Form https://systeme.io/?sa=YOUR_ACTUAL_ID, replacing placeholder with the exact ID, and verify the resulting link.
-5. Set partners.systeme.affiliate in affiliate-links.js to that exact URL, and verify after deployment.
+1. Linked user-provided referral URL: https://systeme.io/tr/2/161/15056344105/39837047/447807792e1392d2a8c0533efc41603aadbd41b00
+2. Verified it resolves to the legitimate systeme.io home page with referral query parameters.
+3. Entered it under partners.systeme.affiliate in affiliate-links.js and applied to site and guide provider links.
+4. Verify referral clicks and commission attribution using the systeme.io affiliate dashboard; the site cannot itself verify qualified sales.
 Reference: https://help.systeme.io/article/328-how-to-create-an-affiliate-link-from-a-system-io-blog-post
 
 ## Shopify
