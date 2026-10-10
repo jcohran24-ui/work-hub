@@ -10,7 +10,7 @@ document.querySelectorAll("a[data-affiliate]").forEach(link=>{
   if(!partner)return;
   if(partner.affiliate){
     try{const url=new URL(partner.affiliate);
-      if(url.protocol==="https:"){link.href=url.href;link.rel="noopener noreferrer sponsored";link.dataset.referralActive="true";return;}
+      if(url.protocol==="https:"){link.href=url.href;link.rel="noopener noreferrer sponsored";link.dataset.referralActive="true";const notice=document.createElement("span");notice.textContent=" (affiliate link — we may earn a commission)";notice.style.fontSize=".76em";notice.style.color="#526b5b";link.insertAdjacentElement("afterend",notice);return;}
     }catch(e){}
   }
   link.href=partner.official;link.rel="noopener noreferrer";link.dataset.referralActive="false";
