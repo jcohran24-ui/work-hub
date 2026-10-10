@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://venture-atlas-guide.onrender.com/sitemap.xml
