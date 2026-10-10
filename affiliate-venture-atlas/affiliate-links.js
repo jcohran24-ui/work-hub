@@ -3,7 +3,8 @@
 const partners=Object.freeze({
   systeme:{official:"https://systeme.io/",affiliate:"https://systeme.io/tr/2/161/15056344105/39837047/447807792e1392d2a8c0533efc41603aadbd41b00"},
   shopify:{official:"https://www.shopify.com/",affiliate:null},
-  kit:{official:"https://kit.com/",affiliate:null}
+  kit:{official:"https://kit.com/",affiliate:null},
+  gumroad:{official:"https://gumroad.com/discover",affiliate:"https://gumroad.com/discover?a=732423523"}
 });
 document.querySelectorAll("a[data-affiliate]").forEach(link=>{
   const partner=partners[link.getAttribute("data-affiliate")];
