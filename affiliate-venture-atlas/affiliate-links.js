@@ -1,7 +1,7 @@
 /* Idea Trellis affiliate-link configuration. Use approved, genuine referral URLs only. */
 (()=>{"use strict";
 const partners=Object.freeze({
-  systeme:{official:"https://systeme.io/",affiliate:null},
+  systeme:{official:"https://systeme.io/",affiliate:"https://systeme.io/tr/2/161/15056344105/39837047/447807792e1392d2a8c0533efc41603aadbd41b00"},
   shopify:{official:"https://www.shopify.com/",affiliate:null},
   kit:{official:"https://kit.com/",affiliate:null}
 });
