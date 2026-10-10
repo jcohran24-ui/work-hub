@@ -1,4 +1,4 @@
-# Venture Atlas (working brand)
+# Idea Trellis
 
 Independent online-business education and software directory.
 
@@ -18,7 +18,7 @@ Independent online-business education and software directory.
 - Ordinary provider links only; no earnings until partner applications are approved and unique links added.
 
 ## Before public marketing
-1. Choose and verify permanent business/site name and domain (Venture Atlas is provisional).
+1. Choose and verify permanent business/site name and domain (Idea Trellis is provisional).
 2. Register and obtain approved affiliate tracking links, add affiliate disclosure by relevant links.
 3. Finalize business operator identity and contact email, update legal/privacy notices.
 4. Add compliant email opt-in connected to a provider, and configure an updated privacy policy.
@@ -26,3 +26,8 @@ Independent online-business education and software directory.
 6. Obtain relevant product imagery/licensing before adding images.
 
 No changes should be made to the repository's main branch for this site without an intentional migration plan.
+
+## Domain and affiliate rollout
+- ideatrellis.com not yet registered; site stays at https://venture-atlas-guide.onrender.com until DNS/Render certificate validated.
+- Affiliate URLs will be stored in affiliate-links.js after approved signup. Existing ordinary vendor links do not pay commission.
+- A separate Render static site uses this development branch and does not affect any main branch applications.
